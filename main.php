@@ -14,6 +14,8 @@ else {
   die("Access denied");
 }
 
+$delete_handled = array();
+
 class BoardLink {
   function __construct($boardname, $self, $connected) {
     $this->boardname = $boardname;
@@ -80,7 +82,7 @@ class BoardLink {
   }
 
   function configure_callback() {
-    global $board, $config;
+    global $board, $config, $delete_handled;
 
     if (!isset ($this->connected[$_POST['password']])) {
       $this->handle_error("ERR_PASSWD", $_POST['from'], "unk");
@@ -166,7 +168,10 @@ class BoardLink {
         break;
 
       case 'delete':
-	deletePost($data['post']['id'], false);
+        if (!isset ($delete_handled[$this->boardname.$data['post']['id']])) {
+	  $delete_handled[$this->boardname.$data['post']['id']] = true;
+	  deletePost($data['post']['id'], false);
+	}
 
         break;
     }
