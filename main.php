@@ -22,17 +22,17 @@ class BoardLink {
   }
 
   function send_data($uri, $password, $data) {
-    $data = http_build_query(array('password' => $password,
+    $d = http_build_query(array('password' => $password,
 				   'from' => $this->self,
                                    'data' => serialize($data)));
     $ctx = stream_context_create(array('http' => array(
 				         'method' => 'POST',
                                          'header' => "Content-type: application/x-www-form-urlencoded\r\n".
-				                     "Content-length: ".strlen($data)."\r\n",
-					 'content' => $data)));
+				                     "Content-length: ".strlen($d)."\r\n",
+					 'content' => $d)));
     $fp = file_get_contents($uri.'callback.php', false, $ctx);
 
-    _syslog("BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
+    _syslog(LOG_INFO, "BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
     return $fp;
   }
 
@@ -64,7 +64,7 @@ class BoardLink {
     event_handler('post-after', function($post) {
       $data = array();
       $data['action'] = 'create';
-      $post['ip'] = $_SERVER['REMOTE_ADDR'];
+      if (!isset ($post['ip'])) $post['ip'] = $_SERVER['REMOTE_ADDR'];
       $data['post'] = $post;
       foreach ($this->connected as $password => $uri) {
 	if (!isset($data['post']['origin']) || $data['post']['origin'] != $uri) {
@@ -104,6 +104,8 @@ class BoardLink {
                 if (!$thread = $query->fetch(PDO::FETCH_ASSOC)) {
 			$this->handle_error("ERR_DESYNC", $uri, $data['action']);
                 }
+
+                $numposts = numPosts($data['post']['thread']);
         }
 
         $a = array("src" => "file", "thumb" => "thumb");

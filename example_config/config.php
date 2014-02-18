@@ -10,5 +10,5 @@ $b = new BoardLink(basename(dirname(__FILE__)),
 		'password' => 'http://int.vichan.net/uk/',
 	)
 );
-if (defined('BOARDLINK_IN') && BOARDLINK_IN == 'config') $b->configure_board();
+$b->configure_board();
 ?>
