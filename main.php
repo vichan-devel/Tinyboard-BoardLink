@@ -86,7 +86,7 @@ class BoardLink {
   }
 
   function configure_callback() {
-    global $board, $config, $delete_from;
+    global $board, $config, $delete_from, $build_pages;
 
     if (!isset ($this->connected[$_POST['password']])) {
       $this->handle_error("ERR_PASSWD", $_POST['from'], "unk");
@@ -169,12 +169,20 @@ class BoardLink {
         
         buildIndex();
 
+        if ($post['op'])
+                rebuildThemes('post-thread', $board['uri']);
+        else
+                rebuildThemes('post', $board['uri']);
+
         break;
 
       case 'delete':
 	$delete_from = $uri;
 	deletePost($data['post']['id'], false);
 	$delete_from = false;
+
+        buildIndex();
+        rebuildThemes('post-delete', $board['uri']);
 
         break;
     }
