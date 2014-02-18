@@ -31,6 +31,8 @@ class BoardLink {
 				                     "Content-length: ".strlen($data)."\r\n",
 					 'content' => $data)));
     $fp = file_get_contents($uri.'callback.php', false, $ctx);
+
+    _syslog("BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
     return $fp;
   }
 
