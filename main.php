@@ -49,8 +49,6 @@ class BoardLink {
 
     if ($config['vichan_federation']) {
       $config['locale'] = "en_US.UTF-8";
-      $config['blotter'] .= '. Please visit <a href="https://int.vichan.net/*/">https://int.vichan.net/*/</a>'.
-				' to get a feed of all /int/s from VICHAN Federation.';
       $config['country_flags'] = true;
     }
 
