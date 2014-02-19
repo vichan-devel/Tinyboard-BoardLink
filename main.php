@@ -84,7 +84,7 @@ class BoardLink {
   }
 
   function configure_callback() {
-    global $board, $config, $delete_from, $build_pages;
+    global $board, $config, $delete_from, $build_pages, $pdo;
 
     if (!isset ($this->connected[$_POST['password']])) {
       $this->handle_error("ERR_PASSWD", $_POST['from'], "unk");
