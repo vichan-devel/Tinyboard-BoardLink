@@ -10,20 +10,32 @@ At the moment only "create post" and "delete post" actions are synchronized.
 
 Usage
 -----
-Name this directory "boardlink" and put it in the root directory of your
+Name this directory ```boardlink``` and put it in the root directory of your
 Tinyboard installation.
 
-Then, copy files from example_config/ to your board's directory. 
+Then, copy files from ```example_config/``` to your board's directory.
+Afterwards, edit your ```config.php``` file.
 
 
 Spanning trees
 --------------
 You can synchronize as many boards as you'd like, but you must avoid circular
-links. Basically, you must construct a tree, not a graph. Eg.:
+links. Basically, you must construct a tree, not a graph. Eg. this is ok:
 
-            ,--- board2  ,--- board5
-    board1 -+--- board3 -+--- board6
-            `--- board4  `--- board7
+              ,--- board2    ,--- board5
+    board1 ---+--- board3 ---+--- board6
+              `--- board4    `--- board7
+
+This is not:
+
+                   ,--- board2    ,--- board5 ---.
+    ,--- board1 ---+--- board3 ---+--- board6    | 
+    |              `--- board4    `--- board7    |
+    `--------------------------------------------'
+
+This isn't a restriction. It's a conscious design choice. IRC Networks work
+this way and it just implies, that the farthest nodes have the biggest lag
+between themselves.
 
 
 Compatibility
