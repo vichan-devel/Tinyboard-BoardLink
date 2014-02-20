@@ -16,6 +16,10 @@ Tinyboard installation.
 Then, copy files from ```example_config/``` to your board's directory.
 Afterwards, edit your ```config.php``` file.
 
+Before launching the boards to the public, make sure, that all board mirrors
+have the same content (or are null). Otherwise, synchronization will work,
+but post id clashes will happen very often.
+
 
 Spanning trees
 --------------
