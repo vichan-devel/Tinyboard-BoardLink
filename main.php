@@ -134,6 +134,10 @@ class BoardLink {
 		$query = prepare(sprintf("DELETE FROM ``posts_%s`` WHERE `id`=:tmpid", $board['uri']));
 		$query->bindValue("tmpid", $tmpid);
 		$query->execute();
+
+		// Reset the auto increment
+		query(sprintf("ALTER TABLE ``posts_%s`` AUTO_INCREMENT = 1", $board['uri']));
+
 		$this->handle_error("ERR_DUPLICATE_ID", $uri, $data['action']);		
 	}
 
