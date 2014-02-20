@@ -42,7 +42,7 @@ class BoardLink {
                                          'header' => "Content-type: application/x-www-form-urlencoded\r\n".
 				                     "Content-length: ".strlen($d)."\r\n",
 					 'content' => $d)));
-    $this->queue[] = array($ctx, $uri);
+    $this->queue[] = array($ctx, $uri, $data['action']);
   }
 
   function commit_send_as_last() {
@@ -58,10 +58,10 @@ class BoardLink {
     }
 
     foreach ($this->queue as $value) {
-      list($ctx, $uri) = $value;
+      list($ctx, $uri, $action) = $value;
       $fp = file_get_contents($uri.'callback.php', false, $ctx);
 
-      _syslog(LOG_INFO, "BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
+      _syslog(LOG_INFO, "BoardLink: sent query of type $action from {$this->self} to $uri. Query yielded $fp");
     }
 
     $this->queue = array();
