@@ -16,9 +16,33 @@ Tinyboard installation.
 Then, copy files from ```example_config/``` to your board's directory.
 Afterwards, edit your ```config.php``` file.
 
+In the ```config.php``` file, the first string parameter is your board
+location. So, eg. if your board is ```http://example.com/b/``` you should
+set that to exactly that value. Use https instead of the http, if your
+webserver is configured properly.
+
+Think about the password. It can be a bunch of random characters. Give that
+password to the other party, along with your board url you set up in the
+previous step. This is important, that this string is the same on both parts,
+this is your login. The password should be the same on both ends.
+
+Be aware, that when your password gets leaked, the third party will be able
+to remove your posts and inject raw html.
+
 Before launching the boards to the public, make sure, that all board mirrors
 have the same content (or are null). Otherwise, synchronization will work,
 but post id clashes will happen very often.
+
+
+Slow execution considerations
+-----------------------------
+We highly recommend our users to use php-fpm instead of the regular FastCGI
+process manager. The plugin will work nevertheless, but using php-fpm allows
+us to do use a fastcgi_finish_request() function, so that the synchronization
+occurs in the background.
+
+Actually, this is very important for big hubs, or else the posting on every
+synced board will take so much precious time.
 
 
 Spanning trees

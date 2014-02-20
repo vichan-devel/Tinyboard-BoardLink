@@ -14,6 +14,10 @@ else {
   die("Access denied");
 }
 
+// Version history (protocol compatibility):
+// 1 - initial version
+define("BOARDLINK_VERSION", "1");
+
 $delete_from = false;
 
 class BoardLink {
@@ -21,21 +25,46 @@ class BoardLink {
     $this->boardname = $boardname;
     $this->self = $self;
     $this->connected = $connected;
+
+    $this->queue = array();
   }
 
   function send_data($uri, $password, $data) {
+    ignore_user_abort(true); // this is a critical code, we don't want users to desync boards
+			     // by quitting at a random moment
+
     $d = http_build_query(array('password' => $password,
 				   'from' => $this->self,
+				   'version' => BOARDLINK_VERSION,
                                    'data' => serialize($data)));
     $ctx = stream_context_create(array('http' => array(
 				         'method' => 'POST',
                                          'header' => "Content-type: application/x-www-form-urlencoded\r\n".
 				                     "Content-length: ".strlen($d)."\r\n",
 					 'content' => $d)));
-    $fp = file_get_contents($uri.'callback.php', false, $ctx);
+    $this->queue[] = array($ctx, $uri);
+  }
 
-    _syslog(LOG_INFO, "BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
-    return $fp;
+  function commit_send_as_last() {
+    register_shutdown_function(array($this, "commit_send"));
+  }
+
+  function commit_send() {
+    global $request_finished;
+
+    if (function_exists("fastcgi_finish_request") && !isset($request_finished)) {
+      fastcgi_finish_request(); // hooray! php-fpm!
+      $request_finished = true;
+    }
+
+    foreach ($this->queue as $value) {
+      list($ctx, $uri) = $value;
+      $fp = file_get_contents($uri.'callback.php', false, $ctx);
+
+      _syslog(LOG_INFO, "BoardLink: sent query of type {$data['action']} from {$this->self} to $uri. Query yielded $fp");
+    }
+
+    $this->queue = array();
   }
 
   function configure_board() {
@@ -63,6 +92,7 @@ class BoardLink {
 	  $this->send_data($uri, $password, $data);
 	}
       }
+      register_shutdown_function(array($this, "commit_send_as_last"));
     });
 
     event_handler('post-after', function($post) {
@@ -75,23 +105,28 @@ class BoardLink {
           $this->send_data($uri, $password, $data);
 	}
       }
+      register_shutdown_function(array($this, "commit_send_as_last"));
     });
   }
 
   function handle_error($err, $from, $sort) {
     _syslog(LOG_INFO, "BoardLink: received query of type $sort from $from to {$this->self}. Query finished with $err");
-    die('{status:"'.$err.'"}');
+    die('{status:"'.$err.'",version:"'.BOARDLINK_VERSION.'"}');
   }
 
   function configure_callback() {
     global $board, $config, $delete_from, $build_pages, $pdo;
 
+    if (!isset ($_POST['password'])) {
+      $this->handle_error("ERR_NOREQUEST", "nil", "nil");
+    }
+
     if (!isset ($this->connected[$_POST['password']])) {
-      $this->handle_error("ERR_PASSWD", $_POST['from'], "unk");
+      $this->handle_error("ERR_PASSWD", $_POST['from'], "nil");
     }
     $uri = $this->connected[$_POST['password']];
     if ($uri != $_POST['from']) {
-      $this->handle_error("ERR_FROM", $_POST['from'], "unk");
+      $this->handle_error("ERR_FROM", $_POST['from'], "nil");
     }
     $data = unserialize($_POST['data']);
 
@@ -192,6 +227,9 @@ class BoardLink {
         rebuildThemes('post-delete', $board['uri']);
 
         break;
+
+      default:
+        $this->handle_error("ERR_UNSUPPORTED", $uri, $data['action']);
     }
 
     $this->handle_error("OK", $uri, $data['action']);
