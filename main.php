@@ -130,7 +130,12 @@ class BoardLink {
 	$query = prepare(sprintf("UPDATE ``posts_%s`` SET `id`=:id WHERE `id`=:tmpid", $board['uri']));
 	$query->bindValue("id", $id = $data['post']['id']);
 	$query->bindValue("tmpid", $tmpid);
-	$query->execute();
+	if (!$query->execute()) {
+		$query = prepare(sprintf("DELETE FROM ``posts_%s`` WHERE `id`=:tmpid", $board['uri']));
+		$query->bindValue("tmpid", $tmpid);
+		$query->execute();
+		$this->handle_error("ERR_DUPLICATE_ID", $uri, $data['action']);		
+	}
 
 	// Reset the auto increment
 	query(sprintf("ALTER TABLE ``posts_%s`` AUTO_INCREMENT = 1", $board['uri']));
