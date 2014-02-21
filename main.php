@@ -71,10 +71,20 @@ class BoardLink {
     global $config;
 
     $config['blotter'] = "This board is synchronized with ";
-    foreach ($this->connected as $boardurl) {
-      $config['blotter'] .= "<a href='$boardurl'>$boardurl</a> and ";
+    $a = array_values($this->connected);
+    array_walk($a, function(&$v, $k){
+        $v = "<a href=\"$v\">$v</a>";
+    });
+    $count = count($a);
+
+    if ($count == 0) {
+        $synced = '';
+    } elseif ($count == 1) {
+        $synced = $a[0];
+    } else {
+        $synced = implode(', ', array_slice($a,0,$count-1)) . ' and ' . end($a);
     }
-    $config['blotter'] = preg_replace('/ and $/', '', $config['blotter']);
+    $config['blotter'] .= $synced;
 
     if ($config['vichan_federation']) {
       $config['locale'] = "en_US.UTF-8";
