@@ -87,7 +87,10 @@ class BoardLink {
     $config['blotter'] .= $synced;
 
     if ($config['vichan_federation']) {
-      $config['locale'] = "en_US.UTF-8";
+      if ($config['locale'] != 'en') {
+        $config['locale'] = "en";
+	$config['file_script'] = "main-en.js";
+      }
       $config['country_flags'] = true;
     }
 
