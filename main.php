@@ -108,6 +108,10 @@ class BoardLink {
       register_shutdown_function(array($this, "commit_send_as_last"));
     });
 
+    event_handler('post', function($post) {
+      $post->time = time();
+    });
+
     event_handler('post-after', function($post) {
       $data = array();
       $data['action'] = 'create';
