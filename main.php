@@ -60,8 +60,8 @@ class BoardLink {
     foreach ($this->queue as $value) {
       list($ctx, $uri, $action) = $value;
       $fp = file_get_contents($uri.'callback.php', false, $ctx);
-
-      _syslog(LOG_INFO, "BoardLink: sent query of type $action from {$this->self} to $uri. Query yielded $fp");
+      if ($config['syslog'])
+        _syslog(LOG_INFO, "BoardLink: sent query of type $action from {$this->self} to $uri. Query yielded $fp");
     }
 
     $this->queue = array();
@@ -123,7 +123,8 @@ class BoardLink {
   }
 
   function handle_error($err, $from, $sort) {
-    _syslog(LOG_INFO, "BoardLink: received query of type $sort from $from to {$this->self}. Query finished with $err");
+    if ($config['syslog'])
+      _syslog(LOG_INFO, "BoardLink: received query of type $sort from $from to {$this->self}. Query finished with $err");
     die('{status:"'.$err.'",version:"'.BOARDLINK_VERSION.'"}');
   }
 
