@@ -128,9 +128,9 @@ class BoardLink {
       $data['post'] = $post;
       foreach ($this->connected as $password => $uri) {
 	if (!isset($data['post']['origin']) || $data['post']['origin'] != $uri) {
-	  $images = isset ($data['post']['images']) ? json_decode($data['post']['images']) : NULL;
+	  $files = isset ($data['post']['files']) ? json_decode($data['post']['files']) : NULL;
           foreach ($v45to50_conversion as $from => $to) {
-            $data['post'][$from] = $images ? $images[0][$to] : (isset ($data['post'][$from]) ? $data['post'][$from] : NULL);
+            $data['post'][$from] = $files ? $files[0][$to] : (isset ($data['post'][$from]) ? $data['post'][$from] : NULL);
           }
 	  
           $this->send_data($uri, $password, $data);
@@ -181,20 +181,20 @@ class BoardLink {
 
         $a = array("src" => "file", "thumb" => "thumb");
 
-	$images = false;
+	$files = false;
 
-	if (isset ($data['post']['images'])) {
-		$images = json_decode($data['post']['images']);
+	if (isset ($data['post']['files'])) {
+		$files = $data['post']['files']);
 	}
 	elseif ($data['post']['file']) {
-		$images = array(array());
+		$files = array(array());
 
 		foreach ($v45to50_conversion as $from => $to) {
-			$images[0][$to] = $data['post'][$from];
+			$files[0][$to] = $data['post'][$from];
 		}
 	}
 
-	foreach ($images as $image) {
+	foreach ($files as $image) {
           foreach ($a as $dir => $field) {
             if (isset($image[$field]) && $image[$field] &&
               $image[$field] != 'spoiler' && $image[$field] != 'deleted') {
@@ -211,11 +211,11 @@ class BoardLink {
 
 	// Tinyboard / vichan 4.5 compatibility
 	foreach ($v45to50_conversion as $from => $to) {
-		$data['post'][$from] = $images ? $images[0][$to] : NULL;
+		$data['post'][$from] = $files ? $files[0][$to] : NULL;
 	}
 
 	// vichan 5.0 compatibility
-	$data['post']['images'] = $images ? json_encode($images) : NULL;
+	$data['post']['files'] = $files ? json_encode($files) : NULL;
 
 	$tmpid = post($data['post']);
 
