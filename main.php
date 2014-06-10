@@ -128,7 +128,7 @@ class BoardLink {
       $data['post'] = $post;
       foreach ($this->connected as $password => $uri) {
 	if (!isset($data['post']['origin']) || $data['post']['origin'] != $uri) {
-	  $files = isset ($data['post']['files']) ? json_decode($data['post']['files']) : NULL;
+	  $files = isset ($data['post']['files']) ? $data['post']['files'] : NULL;
           foreach ($v45to50_conversion as $from => $to) {
             $data['post'][$from] = $files ? $files[0][$to] : (isset ($data['post'][$from]) ? $data['post'][$from] : NULL);
           }
@@ -184,7 +184,7 @@ class BoardLink {
 	$files = false;
 
 	if (isset ($data['post']['files'])) {
-		$files = $data['post']['files']);
+		$files = $data['post']['files'];
 	}
 	elseif ($data['post']['file']) {
 		$files = array(array());
@@ -215,7 +215,7 @@ class BoardLink {
 	}
 
 	// vichan 5.0 compatibility
-	$data['post']['files'] = $files ? json_encode($files) : NULL;
+	$data['post']['files'] = $files ? $files : NULL;
 
 	$tmpid = post($data['post']);
 
