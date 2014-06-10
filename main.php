@@ -16,9 +16,16 @@ else {
 
 // Version history (protocol compatibility):
 // 1 - initial version
-define("BOARDLINK_VERSION", "1");
+// 2 - support for vichan 5.0 (this protocol version should be compatible with 1)
+define("BOARDLINK_VERSION", "2");
 
 $delete_from = false;
+
+// TB/vi 4.5 to vi 5.0 conversion for multiimage format
+$v45to50_conversion = array('file'       => 'file',       'thumb'       => 'thumb',      'filename' => 'filename',
+			    'size'       => 'filesize',   'width'       => 'width',      'height'   => 'height',
+			    'thumbwidth' => 'thumbwidth', 'thumbheight' => 'thumbheight');
+
 
 class BoardLink {
   function __construct($boardname, $self, $connected) {
@@ -68,7 +75,7 @@ class BoardLink {
   }
 
   function configure_board() {
-    global $config;
+    global $config, $v45to50_conversion;
 
     $config['blotter'] = "This board is synchronized with ";
     $a = array_values($this->connected);
@@ -113,12 +120,19 @@ class BoardLink {
     });
 
     event_handler('post-after', function($post) {
+      global $v45to50_conversion;
+
       $data = array();
       $data['action'] = 'create';
       if (!isset ($post['ip'])) $post['ip'] = $_SERVER['REMOTE_ADDR'];
       $data['post'] = $post;
       foreach ($this->connected as $password => $uri) {
 	if (!isset($data['post']['origin']) || $data['post']['origin'] != $uri) {
+	  $images = isset ($data['post']['images']) ? json_decode($data['post']['images']) : NULL;
+          foreach ($v45to50_conversion as $from => $to) {
+            $data['post'][$from] = $images ? $images[0][$to] : (isset ($data['post'][$from]) ? $data['post'][$from] : NULL);
+          }
+	  
           $this->send_data($uri, $password, $data);
 	}
       }
@@ -132,7 +146,7 @@ class BoardLink {
   }
 
   function configure_callback() {
-    global $board, $config, $delete_from, $build_pages, $pdo;
+    global $board, $config, $delete_from, $build_pages, $pdo, $v45to50_conversion;
 
     if (!isset ($_POST['password'])) {
       $this->handle_error("ERR_NOREQUEST", "nil", "nil");
@@ -165,17 +179,43 @@ class BoardLink {
         }
 
         $a = array("src" => "file", "thumb" => "thumb");
-        foreach ($a as $dir => $field) {
-          if (isset($data['post'][$field]) && $data['post'][$field] &&
-              $data['post'][$field] != 'spoiler' && $data['post'][$field] != 'deleted') {
-	    // Security filename checks
-	    if (preg_match('@\.php|\.phtml|\.ht|\.\.|\x00|/@i', $data['post'][$field])) {
-	      $this->handle_error("ERR_SECURITY", $uri, $data['action']);
+
+	$images = false;
+
+	if (isset ($data['post']['images'])) {
+		$images = json_decode($data['post']['images']);
+	}
+	elseif ($data['post']['file']) {
+		$images = array(array());
+
+		foreach ($v45to50_conversion as $from => $to) {
+			$images[0][$to] = $data['post'][$from];
+		}
+	}
+
+	foreach ($images as $image) {
+          foreach ($a as $dir => $field) {
+            if (isset($image[$field]) && $image[$field] &&
+              $image[$field] != 'spoiler' && $image[$field] != 'deleted') {
+
+	      // Security filename checks
+	      if (preg_match('@\.php|\.phtml|\.ht|\.\.|\x00|/@i', $image[$field])) {
+	        $this->handle_error("ERR_SECURITY", $uri, $data['action']);
+	      }
+              $i = file_get_contents($uri.$dir.'/'.$image[$field]);
+              file_put_contents($this->boardname.'/'.$dir.'/'.$image[$field], $i);
 	    }
-            $i = file_get_contents($uri.$dir.'/'.$data['post'][$field]);
-            file_put_contents($this->boardname.'/'.$dir.'/'.$data['post'][$field], $i);
           }
         }
+
+	// Tinyboard / vichan 4.5 compatibility
+	foreach ($v45to50_conversion as $from => $to) {
+		$data['post'][$from] = $images ? $images[0][$to] : NULL;
+	}
+
+	// vichan 5.0 compatibility
+	$data['post']['images'] = $images ? json_encode($images) : NULL;
+
 	$tmpid = post($data['post']);
 
 	// Post doesn't cover custom post IDs
