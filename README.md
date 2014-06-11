@@ -71,9 +71,9 @@ Compatibility
 This code should basically work on every Tinyboard instance but, some
 events may not be propagated, or another issues may arise if you have an
 outdated Tinyboard version. You can cherry-pick missing commits yourself
-using ```git fetch http://github.com/vichan-devel/Tinyboard.git``` and
+using ```git fetch http://github.com/vichan-devel/vichan.git``` and
 then ```git cherry-pick e7f25aa480```. You can also apply those changes
-by hand by visiting: ```https://github.com/vichan-devel/Tinyboard/commit/e7f25aa480```.
+by hand by visiting: ```https://github.com/vichan-devel/vichan/commit/e7f25aa480```.
 The Tinyboard version listed is the one that is certain to have that code
 included.
 
@@ -81,6 +81,13 @@ included.
 | ---------- | ------------------- | ----------------------------- |
 | e7f25aa480 | v0.9.6-dev-12       | Delete support                |
 | cbf44d4d75 | vichan-devel-4.4.95 | Fix potential error on delete |
+
+The current version of Tinyboard-BoardLink is compatible with:
+
+* Tinyboard
+* Tinyboard + vichan-devel
+* vichan 4.5 (recommended, for now)
+* vichan 5.0 (should mostly work)
 
 
 Support
