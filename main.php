@@ -120,7 +120,9 @@ class BoardLink {
       $post->time = time();
     });
 
-    event_handler('post-after', function($post) use($v45to50_conversion) {
+    event_handler('post-after', function($post) {
+      global $v45to50_conversion;
+
       $data = array();
       $data['action'] = 'create';
       if (!isset ($post['ip'])) $post['ip'] = $_SERVER['REMOTE_ADDR'];
