@@ -180,7 +180,7 @@ class BoardLink {
 
         $a = array("src" => "file", "thumb" => "thumb");
 
-	$files = false;
+	$files = array();
 
 	if (isset ($data['post']['files'])) {
 		$files = $data['post']['files'];
