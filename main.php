@@ -58,7 +58,7 @@ class BoardLink {
   }
 
   function commit_send() {
-    global $request_finished;
+    global $request_finished, $config;
 
     if (function_exists("fastcgi_finish_request") && !isset($request_finished)) {
       fastcgi_finish_request(); // hooray! php-fpm!
@@ -142,6 +142,7 @@ class BoardLink {
   }
 
   function handle_error($err, $from, $sort) {
+    global $config;
     if ($config['syslog'])
       _syslog(LOG_INFO, "BoardLink: received query of type $sort from $from to {$this->self}. Query finished with $err");
     die('{status:"'.$err.'",version:"'.BOARDLINK_VERSION.'"}');
