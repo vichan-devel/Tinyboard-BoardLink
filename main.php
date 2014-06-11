@@ -128,7 +128,7 @@ class BoardLink {
       foreach ($this->connected as $password => $uri) {
 	if (!isset($data['post']['origin']) || $data['post']['origin'] != $uri) {
 	  $files = isset ($data['post']['files']) ? $data['post']['files'] : NULL;
-          foreach ($v45to50_conversion as $from => $to) {
+          foreach ($v45to50_conversion as $to => $from) {
             $data['post'][$from] = $files ? $files[0][$to] : (isset ($data['post'][$from]) ? $data['post'][$from] : NULL);
           }
 	  
@@ -188,7 +188,7 @@ class BoardLink {
 	elseif ($data['post']['file']) {
 		$files = array(array());
 
-		foreach ($v45to50_conversion as $from => $to) {
+		foreach ($v45to50_conversion as $to => $from) {
 			$files[0][$to] = $data['post'][$from];
 		}
 	}
@@ -209,7 +209,7 @@ class BoardLink {
         }
 
 	// Tinyboard / vichan 4.5 compatibility
-	foreach ($v45to50_conversion as $from => $to) {
+	foreach ($v45to50_conversion as $to => $from) {
 		$data['post'][$from] = $files ? $files[0][$to] : NULL;
 	}
 
