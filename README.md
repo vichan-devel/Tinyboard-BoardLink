@@ -1,9 +1,9 @@
 Tinyboard-BoardLink
 ===================
 
-Tinyboard-BoardLink is a board synchronization plugin for Tinyboard. It
-allows you to have boards, that are synchronized in real time between
-different installations.
+Tinyboard-BoardLink is a board synchronization plugin for Tinyboard and vichan
+imageboard engines. It allows you to have boards, that are synchronized in
+real time between different installations.
 
 At the moment only "create post" and "delete post" actions are synchronized.
 
@@ -68,9 +68,9 @@ between themselves.
 
 Compatibility
 -------------
-This code should basically work on every Tinyboard instance but, some
-events may not be propagated, or another issues may arise if you have an
-outdated Tinyboard version. You can cherry-pick missing commits yourself
+This code should basically work on every Tinyboard and vichan instance but,
+some events may not be propagated, or another issues may arise if you have
+an outdated Tinyboard version. You can cherry-pick missing commits yourself
 using ```git fetch http://github.com/vichan-devel/vichan.git``` and
 then ```git cherry-pick e7f25aa480```. You can also apply those changes
 by hand by visiting: ```https://github.com/vichan-devel/vichan/commit/e7f25aa480```.
