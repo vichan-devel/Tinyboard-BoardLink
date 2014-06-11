@@ -218,6 +218,7 @@ class BoardLink {
 
 	// vichan 5.0 compatibility
 	$data['post']['files'] = $files ? $files : NULL;
+	$data['post']['num_files'] = $files ? count($files) : 0;
 
 	$tmpid = post($data['post']);
 
