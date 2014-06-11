@@ -69,7 +69,7 @@ class BoardLink {
       list($ctx, $uri, $action) = $value;
       $fp = file_get_contents($uri.'callback.php', false, $ctx);
       if ($config['syslog'])
-        _syslog(LOG_INFO, "BoardLink: sent query of type $action from {$this->self} to $uri. Query yielded $fp");
+        _syslog(LOG_INFO, "BoardLink: sent query of type $action from {$this->self} to $uri. Query yielded ".trim($fp));
     }
 
     $this->queue = array();
