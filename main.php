@@ -22,6 +22,7 @@ define("BOARDLINK_VERSION", "2");
 $delete_from = false;
 
 // TB/vi 4.5 to vi 5.0 conversion for multiimage format
+global $v45to50_conversion;
 $v45to50_conversion = array('file'       => 'file',       'thumb'       => 'thumb',      'filename' => 'filename',
 			    'size'       => 'filesize',   'width'       => 'width',      'height'   => 'height',
 			    'thumbwidth' => 'thumbwidth', 'thumbheight' => 'thumbheight');
